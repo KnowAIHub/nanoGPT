@@ -7,7 +7,7 @@ from contextlib import nullcontext
 import torch
 import tiktoken
 from model import GPTConfig, GPT
-
+from time import sleep 
 # -----------------------------------------------------------------------------
 init_from = 'resume' # either 'resume' (from an out_dir) or a gpt2 variant (e.g. 'gpt2-xl')
 out_dir = 'out' # ignored if init_from is not 'resume'
@@ -85,5 +85,16 @@ with torch.no_grad():
     with ctx:
         for k in range(num_samples):
             y = model.generate(x, max_new_tokens, temperature=temperature, top_k=top_k)
-            print(decode(y[0].tolist()))
+            # Output 
+            #print(decode(y[0].tolist()))
+
+            # Stream Output, It's slow
+            # Decode output tokens, and print them one at a time.
+            token_ids = y[0].tolist()
+            for token_id in token_ids:
+                token_txt = decode([token_id])
+                print(token_txt, end='', flush=True)
+                sleep(0.1)
+            print()
+
             print('---------------')
